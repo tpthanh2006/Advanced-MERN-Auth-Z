@@ -1,4 +1,4 @@
-# [🗝️MERN Auth Pro]()
+# [🗝️MERN Auth-Z Pro]()
 
 This project demonstrates advanced user authentication flows, secure authorization mechanisms, and professional-grade user management features.
 
