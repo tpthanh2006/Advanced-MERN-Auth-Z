@@ -1,6 +1,6 @@
 # [🗝️MERN Auth Pro]()
 
-A comprehensive MERN Stack Authentication and Authorization system implementing real-world industry standards. This project demonstrates advanced user authentication flows, secure authorization mechanisms, and professional-grade user management features.
+This project demonstrates advanced user authentication flows, secure authorization mechanisms, and professional-grade user management features.
 
 🛠 Technologies Used
 - React, SCSS, React Router V6, Node.js, Express.js, MongoDB, JWT, Google OAuth, SMTP/Nodemailer, Render (Backend), Vercel (Frontend)
