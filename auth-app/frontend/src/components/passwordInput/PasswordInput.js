@@ -10,23 +10,24 @@ const PasswordInput = ({ placeholder, value, name, onChange, onPaste}) => {
   };
 
   return (
-    <div classname="password">
+    <div className="password">
       <input
-              type={showPassword ? "text" : "password"}
-              placeholder={placeholder}
-              required
-              name={name}
-              value={value}
-              onChange={onChange}
-              onPaste={onPaste}
+        type={showPassword ? "text" : "password"}
+        placeholder={placeholder}
+        required
+        name={name}
+        value={value}
+        onChange={onChange}
+        onPaste={onPaste}
       />
-
       <div className="icon" onClick={togglePassword}>
-        {showPassword ? ( <AiOutlineEye size={20} /> )
-                      : ( <AiOutlineEyeInvisible size={20} />) 
-        }
+        {showPassword ? (
+          <AiOutlineEyeInvisible size={20} />
+        ) : (
+          <AiOutlineEye size={20} />
+        )}
       </div>
-    </div>
+  </div>
   );
 };
 
