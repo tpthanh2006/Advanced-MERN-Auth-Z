@@ -2,6 +2,7 @@ import {BrowserRouter, Routes, Route} from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Home from "./pages/home/Home";
 import Login from "./pages/auth/Login";
+import Forgot from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 
 function App() {
@@ -19,6 +20,10 @@ function App() {
           />
           <Route path="/register" element={
             <Register />
+            }
+          />
+          <Route path="/forgot" element={
+            <Forgot />
             }
           />
         </Routes>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Card from "../../components/card/Card";
 import styles from "./auth.module.scss";
 import { BsCheck2All } from 'react-icons/bs'
@@ -39,6 +39,37 @@ const Register = () => {
       const {name, value} = e.target;
       setFormData({...formData, [name] : value})
     };
+
+    useEffect(() => {
+      //  Check lower & upper case
+      if (password.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/)) {
+        setUCase(true);
+      } else {
+        setUCase(false);
+      }
+
+      //  Check numbers
+      if (password.match(/([0-9])/)) {
+        setNum(true);
+      } else {
+        setNum(false);
+      }
+      
+      //  Check special characters
+      if (password.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) {
+        setSChar(true);
+      } else {
+        setSChar(false);
+      }
+      
+      //  Check password length
+      if (password.length > 5) {
+        setPassLength(true);
+      } else {
+        setPassLength(false);
+      }
+
+    }, [password])
 
     const loginUser = () => {};
 
