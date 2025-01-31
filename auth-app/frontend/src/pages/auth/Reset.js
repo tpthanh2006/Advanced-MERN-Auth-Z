@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import Card from "../../components/card/Card";
+import PasswordInput from "../../components/passwordInput/PasswordInput";
 import styles from "./auth.module.scss";
-import { AiOutlineMail } from "react-icons/ai";
+import { MdPassword } from "react-icons/md";
 import { Link } from 'react-router-dom';
 
-const Forgot = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+const initialState = {
+  password: "",
+  password2: "",
+}
+
+const Reset = () => {
+    const [formData, setFormData] = useState(initialState);
+    const {password, password2} = formData;
 
     const handleInputChange = () => {};
     const loginUser = () => {};
@@ -16,22 +22,27 @@ const Forgot = () => {
       <Card>
           <div className={styles.form}>
           <div className="--flex-center">
-            <AiOutlineMail size={35} color="#999" />
+            <MdPassword size={35} color="#999" />
           </div>
-          <h2>Forgot Password</h2>
+          <h2>Reset Password</h2>
 
           <form onSubmit={loginUser}>
-            <input
-              type="email"
-              placeholder="Email"
-              required
-              name="email"
-              value={email}
-              onChange={handleInputChange} 
+            <PasswordInput
+              placeholder="Password"
+              name="password"
+              value={password}
+              onChange={handleInputChange}
+            />
+
+            <PasswordInput
+              placeholder="Confirm Password"
+              name="password2"
+              value={password2}
+              onChange={handleInputChange}
             />
 
             <button type="submit" className="--btn --btn-primary --btn-block">
-              Forgot
+              Reset Password
             </button>
 
             <div className={styles.links}>
@@ -50,4 +61,4 @@ const Forgot = () => {
   )
 }
 
-export default Forgot
+export default Reset

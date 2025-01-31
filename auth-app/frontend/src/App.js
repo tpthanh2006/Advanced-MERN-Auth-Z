@@ -2,7 +2,8 @@ import {BrowserRouter, Routes, Route} from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Home from "./pages/home/Home";
 import Login from "./pages/auth/Login";
-import Forgot from "./pages/auth/Login";
+import Reset from "./pages/auth/Reset";
+import Forgot from "./pages/auth/Forgot";
 import Register from "./pages/auth/Register";
 
 function App() {
@@ -24,6 +25,10 @@ function App() {
           />
           <Route path="/forgot" element={
             <Forgot />
+            }
+          />
+          <Route path="/resetPassword/:resetToken" element={
+              <Reset />
             }
           />
         </Routes>
