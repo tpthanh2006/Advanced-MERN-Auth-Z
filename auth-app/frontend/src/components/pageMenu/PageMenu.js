@@ -7,7 +7,7 @@ const PageMenu = () => {
        <nav className="--btn-google --p --mb">
           <ul className="home-links">
             <li>
-              <NavLink to="/profile">Login</NavLink>
+              <NavLink to="/profile">Profile</NavLink>
             </li>
 
             <li>

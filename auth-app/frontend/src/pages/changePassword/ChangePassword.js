@@ -25,7 +25,7 @@ const ChangePassword = () => {
         <PageMenu />
         <h2>Change Password</h2>
 
-        <div className="--flex-start profile">
+        <div className="--flex-start change-password">
           <Card cardClass={"card"}>
             <>
               <form>
