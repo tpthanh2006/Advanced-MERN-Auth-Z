@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import Card from "../../components/card/Card";
 import styles from "./auth.module.scss";
-import { AiOutlineMail } from "react-icons/ai";
+import { GrInsecure } from "react-icons/gr";
 import { Link } from 'react-router-dom';
-import PasswordInput from "../../components/passwordInput/PasswordInput";
 
-const Forgot = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+const LoginWithCode = () => {
+    const [loginCode, setLoginCode] = useState("");
 
     const handleInputChange = () => {};
     const loginUser = () => {};
@@ -17,31 +15,35 @@ const Forgot = () => {
       <Card>
           <div className={styles.form}>
           <div className="--flex-center">
-            <AiOutlineMail size={35} color="#999" />
+            <GrInsecure size={35} color="#999" />
           </div>
-          <h2>Forgot Password</h2>
+          <h2>Enter Access Code</h2>
 
           <form onSubmit={loginUser}>
             <input
-              type="email"
-              placeholder="Email"
+              type="text"
+              placeholder="Access Code"
               required
-              name="email"
-              value={email}
-              onChange={handleInputChange} 
+              name="loginCode"
+              value={loginCode}
+              onChange={(e) => setLoginCode(e.target.value)} 
             />
 
             <button type="submit" className="--btn --btn-primary --btn-block">
-              Forgot
+              Proceed to Login
             </button>
+
+            <span className="--flex-center">
+              Check your email for login access code
+            </span>
 
             <div className={styles.links}>
               <p>
                 <Link to="/">- Home</Link>
               </p>
             
-              <p>
-                <Link to="/register">- Register</Link>
+              <p className="v-link --color-primary">
+                <b>Resend Code</b>
               </p>
             </div>
           </form>
@@ -51,4 +53,4 @@ const Forgot = () => {
   )
 }
 
-export default Forgot
+export default LoginWithCode
