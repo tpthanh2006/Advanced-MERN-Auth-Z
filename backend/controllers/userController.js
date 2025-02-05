@@ -7,6 +7,9 @@ var parser = require("ua-parser-js");
 const sendEmail = require("../utils/sendEmail");
 const Token = require("../models/tokenModel");
 const crypto = require("crypto");
+const Cryptr = require("cryptr");
+
+const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 
 // Sign Up
 const registerUser = asyncHandler(async(req, res) => {
@@ -127,6 +130,11 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
   }
 });
 
+// Send Login Code
+const sendLoginCode = asyncHandler(async(req, res) => {
+  res.send("send login code")
+});
+
 // Verify User
 const verifyUser = asyncHandler(async(req, res) => {
   const { verificationToken } = req.params;
@@ -183,7 +191,35 @@ const loginUser= asyncHandler(async(req, res) => {
   }
 
   // Trigger 2FA for unknown UserAgent
+  const ua = parser(req.headers["user-agent"]);
+  const thisUserAgent = ua.ua;
+  console.log(thisUserAgent);
+  const allowedAgent = user.userAgent.includes(thisUserAgent);
 
+  if (!allowedAgent) {
+    // Generate 6 digit code
+    const loginCode = Math.floor(100000 + Math.random() * 900000);
+    console.log(loginCode);
+
+    // Encrypt login code
+    const encryptedLoginCode = crypt.encrypt(loginCode.toString());
+
+    let userToken = await Token.findOne({userId: user._id});
+    if (userToken) {
+      await userToken.deleteOne();
+    }
+
+    // Save token to db
+    await new Token({
+      userId: user._id,
+      lToken: encryptedLoginCode,
+      createAt: Date.now(),
+      expiresAt: Date.now() + 60 * (60 * 100), // 60'
+    }).save();
+   }
+
+   res.status(400);
+   throw new Error("Check your email for login code");
   
   const token = generateToken(user._id) // Generate Token
   if (user && passwordIsCorrect) {
@@ -497,5 +533,6 @@ module.exports = {
   verifyUser,
   forgotPassword,
   resetPassword,
-  changePassword
+  changePassword,
+  sendLoginCode
 }
