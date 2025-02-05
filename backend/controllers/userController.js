@@ -1,11 +1,12 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
-const { generateToken } = require("../utils");
+const { generateToken, hashToken } = require("../utils");
 const jwt = require("jsonwebtoken");
 var parser = require("ua-parser-js");
 const sendEmail = require("../utils/sendEmail");
 const Token = require("../models/tokenModel");
+const crypto = require("crypto");
 
 // Sign Up
 const registerUser = asyncHandler(async(req, res) => {
@@ -86,8 +87,77 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
 
   // Create Verification Token and Save
   const verificationToken = crypto.randomBytes(32).toString("hex") + user._id;
-
   console.log(verificationToken);
+
+  // Hash token and save
+  const hashedToken = hashToken(verificationToken);
+  await new Token({
+    userId: user._id,
+    vToken: hashedToken,
+    createdAt: Date.now(),
+    expiredAt: Date.now() + 60 * (60 * 1000) // expire after 60 mins
+  }).save();
+
+  // Contruct a verification URL
+  const verificationUrl = `${process.env.FRONTEND_URL}/verify/${verificationToken}`;
+
+  // Send verification email
+  const subject = "Verify Your Account - AuthZ Pro";
+  const send_to = user.email;
+  const sent_from = process.env.EMAIL_USER;
+  const reply_to = "tranpthanh2006@gmail.com";
+  const template = "verifyEmail";
+  const name = user.name;
+  const link = verificationUrl;
+
+  try {
+    await sendEmail(
+      subject,
+      send_to,
+      sent_from,
+      reply_to,
+      template,
+      name,
+      link
+    );
+    res.status(200).json({ message: "Verification Email Sent" });
+  } catch (error) {
+    console.error("Email Error:", error);
+    res.status(500).json({ message: "Email not sent, please try again" });
+  }
+});
+
+// Verify User
+const verifyUser = asyncHandler(async(req, res) => {
+  const { verificationToken } = req.params;
+
+  const hashedToken = hashToken(verificationToken);
+  const userToken = await Token.findOne({
+    vToken: hashedToken,
+    expiresAt: {$gt: Date.now()}
+  });
+
+  if (!userToken) {
+    res.status(404);
+    throw new Error("Invalid or Expired Token");
+  }
+
+  // Find User
+  const user = await User.findOne({
+    _id: userToken.userId
+  })
+
+  if (user.isVerified) {
+    res.status(400);
+    throw new Error("User is already verified");
+  }
+
+  // Verify User now
+  user.isVerified = true;
+  await user.save();
+  res.status(200).json({
+    message: "Account Verified Successfully!"
+  });
 });
 
 // Log In
@@ -294,6 +364,124 @@ const sendAutomatedEmail = asyncHandler(async (req, res) => {
   }
 });
 
+// Forgot Password
+const forgotPassword = asyncHandler(async(req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({email});
+
+  if (!user) {
+    res.status(404);
+    throw new Error("No user with this email");
+  }
+
+  // Delete token if already existed in db
+  let token = await Token.findOne({ userId: user._id});
+  if (token) {
+    await token.deleteOne();
+  }
+
+  // Create Reset Token and Save
+  const resetToken = crypto.randomBytes(32).toString("hex") + user._id;
+  console.log(resetToken);
+
+  // Hash token and save
+  const hashedToken = hashToken(resetToken);
+  await new Token({
+    userId: user._id,
+    rToken: hashedToken,
+    createdAt: Date.now(),
+    expiredAt: Date.now() + 60 * (60 * 1000) // expire after 60 mins
+  }).save();
+
+  // Contruct RESET URL
+  const resetUrl = `${process.env.FRONTEND_URL}/verify/${resetToken}`;
+
+  // Send RESET email
+  const subject = "Reset Your Password - AuthZ Pro";
+  const send_to = user.email;
+  const sent_from = process.env.EMAIL_USER;
+  const reply_to = "tranpthanh2006@gmail.com";
+  const template = "forgotPassword";
+  const name = user.name;
+  const link = resetUrl;
+
+  try {
+    await sendEmail(
+      subject,
+      send_to,
+      sent_from,
+      reply_to,
+      template,
+      name,
+      link
+    );
+    res.status(200).json({ message: "Password Reset Email Sent" });
+  } catch (error) {
+    console.error("Email Error:", error);
+    res.status(500).json({ message: "Email not sent, please try again" });
+  }
+});
+
+// Reset Password
+const resetPassword = asyncHandler(async(req, res) => {
+  const { resetToken } = req.params;
+  const { password } = req.body;
+
+  const hashedToken = hashToken(resetToken);
+  const userToken = await Token.findOne({
+    rToken: hashedToken,
+    expiresAt: {$gt: Date.now()}
+  });
+
+  if (!userToken) {
+    res.status(404);
+    throw new Error("Invalid or Expired Token");
+  }
+
+  // Find User
+  const user = await User.findOne({
+    _id: userToken.userId
+  })
+
+  // Now Reset Password
+  user.password = password;
+  await user.save();
+  res.status(200).json({
+    message: "Password Reset Successfully. Please Log In."
+  });
+})
+
+const changePassword = asyncHandler(async(req, res) => {
+    const { oldPassword, password } =req.body
+
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  if (!oldPassword || !password) {
+    res.status(400);
+    throw new Error("Bad request. Please enter old and new password");
+  }
+
+  // Check if old password is correct
+  const passwordIsCorrect = await bcrypt.compare(oldPassword, user.password);
+
+  // Save new password
+  if (user && passswordIsCorrect) {
+    user.password = password;
+    await user.save();
+    res.status(200).json({
+      message: "Password changed succesfully, please re-login.",
+    })
+  } else {
+    res.status(400);
+    throw new Error("Old password is incorrect.")
+  }
+});
+
 module.exports = {
   registerUser,
   loginUser,
@@ -305,5 +493,9 @@ module.exports = {
   loginStatus,
   upgradeUser,
   sendAutomatedEmail,
-  sendVerificationEmail
+  sendVerificationEmail,
+  verifyUser,
+  forgotPassword,
+  resetPassword,
+  changePassword
 }
