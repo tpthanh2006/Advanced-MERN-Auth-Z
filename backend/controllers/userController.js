@@ -132,7 +132,15 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
 
 // Send Login Code
 const sendLoginCode = asyncHandler(async(req, res) => {
-  res.send("send login code")
+  const { email } = req.params;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Find Login Code in DB
 });
 
 // Verify User
