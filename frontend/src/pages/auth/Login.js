@@ -4,6 +4,14 @@ import { Link, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/passwordInput/PasswordInput";
 import styles from "./auth.module.scss";
 import Card from "../../components/card/Card";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { validateEmail } from "../../redux/features/auth/authService";
+import {
+  login,
+  RESET,
+} from "../../redux/features/auth/authSlice";
+import Loader from "../../components/loader/Loader";
 
 const initialState = {
   email: "",
@@ -12,7 +20,11 @@ const initialState = {
 
 const Login = () => {
   const [formData, setFormData] = useState(initialState);
-  const { email, password } = formData;
+    const {email, password} = formData;
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isLoading, isLoggedIn, isSuccess, message} = useSelector((state) => state.auth)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -21,10 +33,33 @@ const Login = () => {
 
   const loginUser = async (e) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      return toast.error("All fields are required")
+    }
+    if (!validateEmail(email)) {
+      return toast.error("Please enter a valid email")
+    }
+
+    const userData = {
+      email, password
+    }
+
+    //console.log(userData)
+    await dispatch(login(userData))
   };
+
+  useEffect(() => {
+    if (isSuccess && isLoggedIn) {
+      navigate("/profile");
+    }
+
+    dispatch(RESET());
+  }, [isLoggedIn, isSuccess, dispatch, navigate]);
 
   return (
     <div className={`container ${styles.auth}`}>
+      {isLoading && <Loader />}
       <Card>
         <div className={styles.form}>
           <div className="--flex-center">

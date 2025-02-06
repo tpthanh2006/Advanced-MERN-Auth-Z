@@ -24,7 +24,7 @@ const initialState = {
 
 const Register = () => {
     const [formData, setFormData] = useState(initialState);
-    const {name, email, password, password2} = formData;
+      const {name, email, password, password2} = formData;
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -109,11 +109,11 @@ const Register = () => {
 
     useEffect(() => {
       if (isSuccess && isLoggedIn) {
-        navigate("/profile")
+        navigate("/profile");
       }
 
-      dispatch(RESET())
-    }, [isLoggedIn, isSuccess, dispatch, navigate])
+      dispatch(RESET());
+    }, [isLoggedIn, isSuccess, dispatch, navigate]);
 
   return (
     <div className={`container ${styles.auth}`}>
