@@ -1,23 +1,37 @@
 import "./Profile.scss"
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Card from "../../components/card/Card"
 import profileImg from "../../assets/avatarr.png";
 import PageMenu from "../../components/pageMenu/PageMenu";
 import useRedirectLoggedOutUser from "../../customHook/useRedirectLoggedOutUser";
-
-const initialState = {
-  name: "",
-  email: "",
-  phone: "",
-  bio: "",
-  role: "",
-  isVerified: false,
-}
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getUser,
+  RESET,
+} from "../../redux/features/auth/authSlice";
+import Loader from "../../components/loader/Loader";
 
 const Profile = () => {
     useRedirectLoggedOutUser("/login");
     const [profile, setProfile] = useState(initialState);
+    
+    const { isLoading, isLoggedIn, isSuccess, message, user } = useSelector((state) => state.auth)
 
+    const initialState = {
+      name: user.name || "",
+      email: user.email || "",
+      phone: user.phone || "",
+      bio: user.bio || "",
+      photo: user.photo || "",
+      role: user.role || "",
+      isVerified: user.isVerified || false,
+    };
+
+    const dispatch = useDispatch();
+    useEffect(() => {
+      dispatch(getUser())
+    }, [dispatch])
+    
     const handleImageChange = () => {
 
     }
@@ -29,6 +43,7 @@ const Profile = () => {
   return <>
     <section>
       <div className="container">
+        {isLoading && <Loader />}
         <PageMenu />
         <h2>Profile</h2>
 
@@ -37,7 +52,7 @@ const Profile = () => {
             <>
               <div className="profile-photo">
                 <div>
-                  <img src={profileImg} alt="profile_img" />
+                  <img src={profile?.photo} alt="profile_img" />
                   <h3>Role: Subscriber</h3>
                 </div>
               </div>

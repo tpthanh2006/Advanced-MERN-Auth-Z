@@ -30,7 +30,13 @@ const logout = async (userData) => {
 
 // Get Login Status
 const getLoginStatus = async (userData) => {
-  const response = await axios.get(API_URL + "loginStatus", userData);
+  const response = await axios.get(API_URL + "loginStatus");
+  return response.data;
+};
+
+// Get User Profile
+const getUser = async (userData) => {
+  const response = await axios.get(API_URL + "getUser");
   return response.data;
 };
 
@@ -38,7 +44,8 @@ const authService = {
   register,
   login,
   logout,
-  getLoginStatus
+  getLoginStatus,
+  getUser
 }
 
 export default authService
