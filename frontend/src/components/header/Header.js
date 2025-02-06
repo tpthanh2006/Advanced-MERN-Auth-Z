@@ -9,6 +9,7 @@ import {
   logout,
   RESET,
 } from "../../redux/features/auth/authSlice";
+import { ShowOnLogin, ShowOnLogout } from "../protect/hiddenLink";
 
 const activeLink = ({isActive}) => (isActive ? "active" : "");
 
@@ -34,28 +35,34 @@ const Header = () => {
             <span>AUTH:Z</span>
           </div>
           <ul className="home-links">
-            <li className='--flex-center'>
-              <FaUserCircle size={20} />
-              <p className="--color-white">
-              Hi, William!
-              </p>
-            </li>
-
+            <ShowOnLogin>
+              <li className='--flex-center'>
+                <FaUserCircle size={20} />
+                <p className="--color-white">
+                Hi, William!
+                </p>
+              </li>
+            </ShowOnLogin>
+            
+            <ShowOnLogout>
             <li>
               <button className="--btn --btn-primary">
                 <Link to="/login">Login</Link>
               </button>
             </li>
+            </ShowOnLogout>
 
-            <li>
-              <NavLink to="/profile" className={activeLink}>Profile</NavLink>
-            </li>
+            <ShowOnLogin>
+              <li>
+                <NavLink to="/profile" className={activeLink}>Profile</NavLink>
+              </li>
 
-            <li>
-              <button onClick={logoutUser} className="--btn --btn-secondary">
-                <Link to="/logout">Logout</Link>
-              </button>
-            </li>
+              <li>
+                <button onClick={logoutUser} className="--btn --btn-secondary">
+                  <Link to="/logout">Logout</Link>
+                </button>
+              </li>
+            </ShowOnLogin>
           </ul>
         </nav>
     </header>
