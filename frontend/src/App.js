@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getLoginStatus,
   RESET,
-} from "../../redux/features/auth/authSlice";
+} from "./redux/features/auth/authSlice";
 
 axios.defaults.withCredentials = true;
 

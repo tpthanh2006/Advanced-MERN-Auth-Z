@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Card from "../../components/card/Card"
 import profileImg from "../../assets/avatarr.png";
 import PageMenu from "../../components/pageMenu/PageMenu";
+import useRedirectLoggedOutUser from "../../customHook/useRedirectLoggedOutUser";
 
 const initialState = {
   name: "",
@@ -14,6 +15,7 @@ const initialState = {
 }
 
 const Profile = () => {
+    useRedirectLoggedOutUser("/login");
     const [profile, setProfile] = useState(initialState);
 
     const handleImageChange = () => {
