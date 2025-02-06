@@ -1,6 +1,7 @@
 import React from 'react'
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
+import { Link } from "react-router-dom";
 import "./Home.scss";
 import loginImg from "../../assets/login.svg";
 
@@ -15,11 +16,11 @@ const Home = () => {
           <p>Implement User Registration, Login, Password Reset, Social Login, User Permission, Email Notifications, etc.</p>
           <div className='hero-buttons --flex-start'>
             <button className='--btn --btn-danger'>
-              Register
+              <Link to="/register">Register</Link>
             </button>
 
             <button className='--btn --btn-primary'>
-              Login
+              <Link to="/login">Login</Link>
             </button>
           </div>
         </div>
