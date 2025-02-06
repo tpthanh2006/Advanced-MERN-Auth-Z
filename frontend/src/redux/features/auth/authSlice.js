@@ -57,8 +57,8 @@ export const logout = createAsyncThunk(
 )
 
 // Get Login Status
-export const loginStatus = createAsyncThunk(
-  "auth/loginStatus",
+export const getLoginStatus = createAsyncThunk(
+  "auth/getLoginStatus",
   async (_, thunkAPI) => {
     try {
       return await authService.loginStatus();
@@ -143,21 +143,18 @@ const authSlice = createSlice({
       })
 
       // Get Login Status
-      .addCase(loginStatus.pending, (state, action) => {
+      .addCase(getLoginStatus.pending, (state, action) => {
         state.isLoading = true;
       })
-      .addCase(loginStatus.fulfilled, (state, action) => {
+      .addCase(getLoginStatus.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.isLoggedIn = false;
-        state.user = null;
-        toast.success(action.payload);
+        state.isLoggedIn = action.payload;
       })
-      .addCase(loginStatus.rejected, (state, action) => {
+      .addCase(getLoginStatus.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
-        toast.error(action.payload);
       })
   }
 });

@@ -29,7 +29,7 @@ const logout = async (userData) => {
 };
 
 // Get Login Status
-const loginStatus = async (userData) => {
+const getLoginStatus = async (userData) => {
   const response = await axios.get(API_URL + "loginStatus", userData);
   return response.data;
 };
@@ -38,7 +38,7 @@ const authService = {
   register,
   login,
   logout,
-  loginStatus
+  getLoginStatus
 }
 
 export default authService
