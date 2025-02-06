@@ -35,8 +35,14 @@ const getLoginStatus = async (userData) => {
 };
 
 // Get User Profile
-const getUser = async (userData) => {
+const getUser = async () => {
   const response = await axios.get(API_URL + "getUser");
+  return response.data;
+};
+
+// Update Profile
+const updateUser = async (userData) => {
+  const response = await axios.patch(API_URL + "updateUser", userData);
   return response.data;
 };
 
@@ -45,7 +51,8 @@ const authService = {
   login,
   logout,
   getLoginStatus,
-  getUser
+  getUser,
+  updateUser
 }
 
 export default authService

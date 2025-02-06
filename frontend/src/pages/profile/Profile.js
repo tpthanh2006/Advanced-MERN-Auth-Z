@@ -13,24 +13,36 @@ import Loader from "../../components/loader/Loader";
 
 const Profile = () => {
     useRedirectLoggedOutUser("/login");
-    const [profile, setProfile] = useState(initialState);
-    
-    const { isLoading, isLoggedIn, isSuccess, message, user } = useSelector((state) => state.auth)
-
-    const initialState = {
-      name: user.name || "",
-      email: user.email || "",
-      phone: user.phone || "",
-      bio: user.bio || "",
-      photo: user.photo || "",
-      role: user.role || "",
-      isVerified: user.isVerified || false,
-    };
-
     const dispatch = useDispatch();
+    const { isLoading, isLoggedIn, isSuccess, message, user } = useSelector((state) => state.auth)
+    
+    const [profile, setProfile] = useState({
+      name: "",
+      email: "",
+      phone: "",
+      bio: "",
+      photo: "",
+      role: "",
+      isVerified: false
+    });
+    
     useEffect(() => {
       dispatch(getUser())
     }, [dispatch])
+
+    useEffect(() => {
+      if (user) {
+        setProfile({
+          name: user.name || "",
+          email: user.email || "",
+          phone: user.phone || "",
+          bio: user.bio || "",
+          photo: user.photo || "",
+          role: user.role || "",
+          isVerified: user.isVerified || false,
+        });
+      }
+    }, [user]);
     
     const handleImageChange = () => {
 
@@ -53,7 +65,7 @@ const Profile = () => {
               <div className="profile-photo">
                 <div>
                   <img src={profile?.photo} alt="profile_img" />
-                  <h3>Role: Subscriber</h3>
+                  <h3>Role: {profile.role}</h3>
                 </div>
               </div>
 
@@ -70,17 +82,17 @@ const Profile = () => {
 
                 <p>
                   <label>Email:</label>
-                  <input type="email" name="email" value={profile.email} onChange={handleInputChange} disabled/>
+                  <input type="email" name="email" value={profile?.email} onChange={handleInputChange} disabled/>
                 </p>
 
                 <p>
                   <label>Phone:</label>
-                  <input type="text" name="phone" value={profile.phone} onChange={handleInputChange}/>
+                  <input type="text" name="phone" value={profile?.phone} onChange={handleInputChange}/>
                 </p>
 
                 <p>
                   <label>Bio:</label>
-                  <textarea name="bio" value={profile.bio} cols="30" rows="10" onChange={handleInputChange}/>
+                  <textarea name="bio" value={profile?.bio} cols="30" rows="10" onChange={handleInputChange}/>
                 </p>
 
                 <button className="--btn --btn-primary --btn-block">
