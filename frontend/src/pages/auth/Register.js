@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import Card from "../../components/card/Card";
-import styles from "./auth.module.scss";
-import { BsCheck2All } from 'react-icons/bs'
-import { FaTimes } from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import { FaTimes } from "react-icons/fa";
+import { BsCheck2All } from "react-icons/bs";
 import { TiUserAddOutline } from "react-icons/ti";
-import { Link, useNavigate } from 'react-router-dom';
-import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
+import Card from "../../components/card/Card";
 import PasswordInput from "../../components/passwordInput/PasswordInput";
+import styles from "./auth.module.scss";
+import { toast } from "react-toastify";
 import { validateEmail } from "../../redux/features/auth/authService";
 import { useDispatch, useSelector } from "react-redux";
 import {
   register,
   RESET,
+  sendVerificationEmail,
 } from "../../redux/features/auth/authSlice";
 import Loader from "../../components/loader/Loader";
 
@@ -104,7 +105,9 @@ const Register = () => {
       }
 
       //console.log(userData)
-      await dispatch(register(userData))
+      await dispatch(register(userData));
+      await dispatch(sendVerificationEmail());
+
     };
 
     useEffect(() => {
