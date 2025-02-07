@@ -8,6 +8,8 @@ const Verify = () => {
   const dispatch = useDispatch();
   const {verificationToken} = useParams();
 
+  const { isLoading } = useSelector((state) => state.auth);
+  
   const verifyAccount = async () => {
     await dispatch(verifyUser(verificationToken));
     await dispatch(RESET());
@@ -15,6 +17,7 @@ const Verify = () => {
 
   return (
     <section>
+      {isLoading && <Loader />}
       <div className="--center-all">
         <h2>Account Verification</h2>
         <p>To verify your account, click the button below...</p>
