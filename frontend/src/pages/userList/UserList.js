@@ -33,6 +33,7 @@ const UserList = () => {
       {/*<UserStats />*/}
 
       <div className="user-list">
+      {isLoading && <Spinner />}
         <div className="table">
           <div className="--flex-between">
             <span>
@@ -46,50 +47,45 @@ const UserList = () => {
             </span>
           </div>
 
-          <table>
-            <thead> 
-              <tr>
-                <th>S/N</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Change Role</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+          {!isLoading && users.length === 0 ? (
+            <>No User Found</>
+          ) : (
+            <table>
+              <thead> 
+                <tr>
+                  <th>S/N</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Change Role</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>William</td>
-                <td>williamtran@gmail.com</td>
-                <td>Admin</td>
-                <td>
-                  <ChangeRole />
-                </td>
-                <td>
-                  <span>
-                    <FaTrash size={20} color="red"/>
-                  </span>
-                </td>
-              </tr>
-
-              <tr>
-                <td>2</td>
-                <td>Nick</td>
-                <td>nicknguyen@gmail.com</td>
-                <td>Subscriber</td>
-                <td>
-                  <ChangeRole />
-                </td>
-                <td>
-                  <span>
-                    <FaTrash size={20} color="red"/>
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              <tbody>
+                {users.map((user, index) => {
+                  const {_id, name, email, role} = user;
+                  return (
+                    <tr key={_id}>
+                      <td>{index}</td>
+                      <td>{name}</td>
+                      <td>{email}</td>
+                      <td>{role}</td>
+                      <td>
+                        <ChangeRole />
+                      </td>
+                      <td>
+                        <span>
+                          <FaTrash size={20} color="red"/>
+                        </span>
+                      </td>
+                  </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+          
         </div>
       </div>
     </div>
