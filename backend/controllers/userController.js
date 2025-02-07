@@ -588,7 +588,7 @@ const resetPassword = asyncHandler(async(req, res) => {
 })
 
 const changePassword = asyncHandler(async(req, res) => {
-    const { oldPassword, password } =req.body
+  const { oldPassword, password } =req.body
 
   const user = await User.findById(req.user._id);
 
@@ -606,8 +606,12 @@ const changePassword = asyncHandler(async(req, res) => {
   const passwordIsCorrect = await bcrypt.compare(oldPassword, user.password);
 
   // Save new password
-  if (user && passswordIsCorrect) {
-    user.password = password;
+  if (user && passwordIsCorrect) {
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    user.password = hashedPassword;
     await user.save();
     res.status(200).json({
       message: "Password changed succesfully, please re-login.",
