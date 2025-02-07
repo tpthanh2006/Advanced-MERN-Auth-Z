@@ -25,7 +25,11 @@ const Reset = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const handleInputChange = () => {};
+    const handleInputChange = (e) => {
+      const { name, value } = e.target;
+      setFormData({ ...formData, [name]: value });
+    };
+
     const reset = async (e) => {
       e.preventDefault();
 
@@ -37,11 +41,10 @@ const Reset = () => {
       }
 
       const userData = {
-        password,
-        password2
+        password
       }
 
-      await dispatch(resetPassword(userData, resetToken));
+      await dispatch(resetPassword({userData, resetToken}));
     }
 
     useEffect(() => {

@@ -1,5 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom';
+import { AdminAuthorLink } from "../protect/hiddenLink";
 
 const PageMenu = () => {
   return (
@@ -14,9 +15,11 @@ const PageMenu = () => {
               <NavLink to="/changePassword">Change Password</NavLink>
             </li>
 
-            <li>
-              <NavLink to="/users">Users</NavLink>
-            </li>
+            <AdminAuthorLink>
+              <li>
+                <NavLink to="/users">Users</NavLink>
+              </li>
+            </AdminAuthorLink>
           </ul>
         </nav>                
     </div>

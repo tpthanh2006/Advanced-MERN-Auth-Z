@@ -113,33 +113,21 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
   const reply_to = process.env.EMAIL_USER;
   const name = user.name;
   const link = verificationUrl;
+  const templateId = "d-b291077696554f609b4c9ab277264256";
 
   try {
-    // Construct the path to the template file
-    const templatePath = path.join(
-      __dirname, 
-      "..", // Go up from controllers directory
-      "views", 
-      "verifyEmail.html" // Specific template file
-    );
-
-    // Read the template file
-    let html = await fs.readFile(templatePath, "utf-8");
-
-    // Replace placeholders with dynamic data
-    html = html.replace("{{name}}", name);
-    html = html.replace("{{link}}", link);
-
     await sendEmail(
-      subject,
       send_to,
       sent_from,
       reply_to,
-      html, // Pass the rendered HTML
-      name,
-      link
+      templateId,
+      {
+        name: name,
+        link: link,
+        subject: subject
+      }
     );
-    
+      
     res.status(200).json({ message: "Verification Email Sent" });
   } catch (error) {
     console.error("Email Error:", error);
@@ -562,55 +550,61 @@ const forgotPassword = asyncHandler(async(req, res) => {
   const resetToken = crypto.randomBytes(32).toString("hex") + user._id;
   console.log(resetToken);
 
-  // Hash token and save
+  // Hash token 
   const hashedToken = hashToken(resetToken);
-  await new Token({
-    userId: user._id,
-    rToken: hashedToken,
-    createdAt: Date.now(),
-    expiredAt: Date.now() + 60 * (60 * 1000) // expire after 60 mins
-  }).save();
-
-  // Contruct RESET URL
-  const resetUrl = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`;
-
-  // Send RESET email
-  const subject = "Reset Your Password - AuthZ Pro"; // Put this in the settings of SendGrid
-  const send_to = user.email;
-  const reply_to = process.env.EMAIL_USER;
-  const sent_from = process.env.EMAIL_USER;
-  const name = user.name;
-  const link = resetUrl;
-  const templateId = "d-33cdce477c4a4e9b9c45ce36a4a806cf";
-
+  
+  // Save token to database
   try {
+    await new Token({
+      userId: user._id,
+      rToken: hashedToken,
+      createdAt: Date.now(),
+      expiredAt: Date.now() + (60 * 60 * 1000) // 1 hour in milliseconds
+    }).save();
+
+    // Construct Reset URL
+    const resetUrl = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`;
+
+    // Send Reset email
+    const subject = "Reset Your Password - AuthZ Pro";
+    const send_to = user.email;
+    const reply_to = process.env.EMAIL_USER;
+    const sent_from = process.env.EMAIL_USER;
+    const name = user.name;
+    const link = resetUrl;
+    const templateId = "d-33cdce477c4a4e9b9c45ce36a4a806cf";
+
     await sendEmail(
       send_to,
       sent_from,
       reply_to,
-      templateId, // Pass the template ID
-      { // Pass dynamic data
+      templateId,
+      {
         name: name,
         link: link,
         subject: subject
       }
     );
-      res.status(200).json({ message: "Password Reset Email Sent" });
-    } catch (error) {
-      console.error("Email Error:", error);
-      res.status(500).json({ message: "Email not sent, please try again" });
-    }
+
+    res.status(200).json({ message: "Password Reset Email Sent" });
+  } catch (error) {
+    console.error("Token/Email Error:", error);
+    res.status(500).json({ message: "Error occurred. Please try again" });
+  }
 });
 
 // Reset Password
-const resetPassword = asyncHandler(async(req, res) => {
+const resetPassword = asyncHandler(async (req, res) => {
   const { resetToken } = req.params;
   const { password } = req.body;
+  console.log(resetToken);
+  console.log(password);
 
   const hashedToken = hashToken(resetToken);
+
   const userToken = await Token.findOne({
     rToken: hashedToken,
-    expiresAt: {$gt: Date.now()}
+    expiresAt: { $gt: Date.now() },
   });
 
   if (!userToken) {
@@ -619,17 +613,14 @@ const resetPassword = asyncHandler(async(req, res) => {
   }
 
   // Find User
-  const user = await User.findOne({
-    _id: userToken.userId
-  })
+  const user = await User.findOne({ _id: userToken.userId });
 
-  // Now Reset Password
+  // Now Reset password
   user.password = password;
   await user.save();
-  res.status(200).json({
-    message: "Password Reset Successful. Please Log In."
-  });
-})
+
+  res.status(200).json({ message: "Password Reset Successful, please login" });
+});
 
 const changePassword = asyncHandler(async(req, res) => {
   const { oldPassword, password } =req.body
