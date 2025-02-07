@@ -10,7 +10,7 @@ import {
   RESET,
 } from "../../redux/features/auth/authSlice";
 import { ShowOnLogin, ShowOnLogout } from "../protect/hiddenLink";
-import { UserName } from "../../pages/profile/Profile";
+import UserName from "../userName/UserName";
 
 const activeLink = ({isActive}) => (isActive ? "active" : "");
 

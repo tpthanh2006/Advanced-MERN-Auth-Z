@@ -5,7 +5,7 @@ import { selectUser } from "../../redux/features/auth/authSlice";
 const UserName = () => {
   const user = useSelector(selectUser);
   const username = user?.name || "...";
-  return <p className="--color-white">&nbsp; Hi, {username} |</p>;
+  return <p className="--color-white">&nbsp; Hi, {username}!&nbsp;</p>;
 };
 
 export default UserName;
