@@ -7,10 +7,10 @@ import PageMenu from "../../components/pageMenu/PageMenu";
 import Search from "../../components/search/Search";
 import UserStats from "../../components/userStats/UserStats";
 import useRedirectLoggedOutUser from "../../customHook/useRedirectLoggedOutUser";
-import { getUsers } from "../../redux/features/auth/authSlice";
+import { deleteUser, getUsers } from "../../redux/features/auth/authSlice";
 import "./UserList.scss";
-//import { confirmAlert } from "react-confirm-alert";
-//import "react-confirm-alert/src/react-confirm-alert.css";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 /*import {
   FILTER_USERS,
   selectUsers,
@@ -26,6 +26,27 @@ const UserList = () => {
   useEffect(() => {
     dispatch(getUsers());
   }, [dispatch])
+
+  const removeUser = async (id) => {
+    await dispatch(deleteUser(id));
+    dispatch(getUsers());
+  }
+
+  const confirmDelete = (id) => {
+    confirmAlert({
+      title: "Delete This User",
+      message: "Are you sure to do delete this user?",
+      buttons: [
+        {
+          label: "Delete",
+          onClick: () => removeUser(id),
+        },
+        {
+          label: "Cancel",
+        },
+      ],
+    });
+  };
 
   return <section>
     <div className="container">
@@ -76,7 +97,7 @@ const UserList = () => {
                       </td>
                       <td>
                         <span>
-                          <FaTrash size={20} color="red"/>
+                          <FaTrash size={20} color="red" onClick={() => confirmDelete(_id)}/>
                         </span>
                       </td>
                   </tr>
