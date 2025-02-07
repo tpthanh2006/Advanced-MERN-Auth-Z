@@ -111,6 +111,20 @@ export const sendVerificationEmail = createAsyncThunk(
   }
 )
 
+// Send Verification Email
+export const verifyUser = createAsyncThunk(
+  "auth/verifyUser",
+  async (verificationToken, thunkAPI) => {
+    try {
+      return await authService.verifyUser(verificationToken);
+    } catch (error) {
+      const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
+
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 const authSlice = createSlice({
   name: "auth",
   initialState,

@@ -3,7 +3,7 @@ import axios from "axios";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API_URL = `${BACKEND_URL}/api/users/`;
 
-// Validate Email
+// Validate email
 export const validateEmail = (email) => {
   return email.match(
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -23,32 +23,41 @@ const login = async (userData) => {
 };
 
 // Logout User
-const logout = async (userData) => {
-  const response = await axios.get(API_URL + "logout", userData);
+const logout = async () => {
+  const response = await axios.get(API_URL + "logout");
   return response.data.message;
 };
 
 // Get Login Status
-const getLoginStatus = async (userData) => {
+const getLoginStatus = async () => {
   const response = await axios.get(API_URL + "loginStatus");
   return response.data;
 };
 
-// Get User Profile
+// Get user profile
 const getUser = async () => {
   const response = await axios.get(API_URL + "getUser");
   return response.data;
 };
 
-// Update Profile
+// Update profile
 const updateUser = async (userData) => {
   const response = await axios.patch(API_URL + "updateUser", userData);
   return response.data;
 };
 
-// Update Profile
+// Send Verification Email
 const sendVerificationEmail = async () => {
-  const response = await axios.patch(API_URL + "sendVerificationEmail");
+  const response = await axios.post(API_URL + "sendVerificationEmail");
+  return response.data.message;
+};
+
+// Verify User
+const verifyUser = async (verificationToken) => {
+  const response = await axios.patch(
+    `${API_URL}verifyUser/${verificationToken}`
+  );
+
   return response.data.message;
 };
 
@@ -59,7 +68,8 @@ const authService = {
   getLoginStatus,
   getUser,
   updateUser,
-  sendVerificationEmail
+  sendVerificationEmail,
+  verifyUser
 }
 
 export default authService
