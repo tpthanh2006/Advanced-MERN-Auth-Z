@@ -110,21 +110,32 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
   const subject = "Verify Your Account - AuthZ Pro";
   const send_to = user.email;
   const sent_from = process.env.EMAIL_USER;
-  const reply_to = "tranpthanh2006@gmail.com";
+  const reply_to = process.env.EMAIL_USER;
   const template = "verifyEmail";
   const name = user.name;
   const link = verificationUrl;
 
   try {
+    // Construct the path to the template file
+    const templatePath = path.join(__dirname, "..", "views", `${template}.html`);
+
+    // Read the template file
+    let html = await fs.readFile(templatePath, "utf-8");
+
+    // Replace placeholders with dynamic data
+    html = html.replace("{{name}}", name);
+    html = html.replace("{{link}}", link);
+
     await sendEmail(
       subject,
       send_to,
       sent_from,
       reply_to,
-      template,
+      html, // Pass the rendered HTML
       name,
       link
     );
+    
     res.status(200).json({ message: "Verification Email Sent" });
   } catch (error) {
     console.error("Email Error:", error);
@@ -160,21 +171,32 @@ const sendLoginCode = asyncHandler(async(req, res) => {
   const subject = "Login Access Code - AuthZ Pro";
   const send_to = email;
   const sent_from = process.env.EMAIL_USER;
-  const reply_to = "tranpthanh2006@gmail.com";
+  const reply_to = process.env.EMAIL_USER;
   const template = "loginCode";
   const name = user.name;
   const link = decryptedLoginCode;
 
   try {
+    // Construct the path to the template file
+    const templatePath = path.join(__dirname, "..", "views", `${template}.html`);
+
+    // Read the template file
+    let html = await fs.readFile(templatePath, "utf-8");
+
+    // Replace placeholders with dynamic data
+    html = html.replace("{{name}}", name);
+    html = html.replace("{{link}}", link);
+
     await sendEmail(
       subject,
       send_to,
       sent_from,
       reply_to,
-      template,
+      html, // Pass the rendered HTML
       name,
       link
     );
+    
     res.status(200).json({ message: `Access code sent to ${email}` });
   } catch (error) {
     res.status(500);
@@ -487,21 +509,19 @@ const sendAutomatedEmail = asyncHandler(async (req, res) => {
 
   try {
     // Construct the path to the template file
-    const templatePath = path.join(__dirname, "..", "views", `${template}.handlebars`);
+    const templatePath = path.join(__dirname, "..", "views", `${template}.html`);
 
     // Read the template file
-    const templateContent = await fs.readFile(templatePath, "utf-8");
+    let html = await fs.readFile(templatePath, "utf-8");
 
-    // Compile the template using Handlebars
-    const handlebars = require("handlebars");
-    const compiledTemplate = handlebars.compile(templateContent);
-
-    // Render the template with the data
-    const html = compiledTemplate({ name, link });
+    // Replace placeholders with dynamic data
+    html = html.replace("{{name}}", name);
+    html = html.replace("{{link}}", link);
 
     await sendEmail(
       subject,
       send_to,
+      sent_from,
       reply_to,
       html, // Pass the rendered HTML
       name,
@@ -549,27 +569,36 @@ const forgotPassword = asyncHandler(async(req, res) => {
   // Send RESET email
   const subject = "Reset Your Password - AuthZ Pro";
   const send_to = user.email;
+  const reply_to = process.env.EMAIL_USER;
   const sent_from = process.env.EMAIL_USER;
-  const reply_to = "tranpthanh2006@gmail.com";
-  const template = "forgotPassword";
   const name = user.name;
   const link = resetUrl;
 
   try {
+    // Construct the path to the template file
+    const templatePath = path.join(__dirname, "..", "views", `${template}.html`);
+
+    // Read the template file
+    let html = await fs.readFile(templatePath, "utf-8");
+
+    // Replace placeholders with dynamic data
+    html = html.replace("{{name}}", name);
+    html = html.replace("{{link}}", link);
+
     await sendEmail(
       subject,
       send_to,
       sent_from,
       reply_to,
-      template,
+      html, // Pass the rendered HTML
       name,
       link
     );
-    res.status(200).json({ message: "Password Reset Email Sent" });
-  } catch (error) {
-    console.error("Email Error:", error);
-    res.status(500).json({ message: "Email not sent, please try again" });
-  }
+      res.status(200).json({ message: "Password Reset Email Sent" });
+    } catch (error) {
+      console.error("Email Error:", error);
+      res.status(500).json({ message: "Email not sent, please try again" });
+    }
 });
 
 // Reset Password

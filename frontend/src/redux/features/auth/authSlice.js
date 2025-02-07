@@ -153,6 +153,20 @@ export const forgotPassword = createAsyncThunk(
   }
 )
 
+// Forgot Password
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async (userData, thunkAPI) => {
+    try {
+      return await authService.resetPassword(userData);
+    } catch (error) {
+      const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
+
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
