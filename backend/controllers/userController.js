@@ -111,13 +111,17 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
   const send_to = user.email;
   const sent_from = process.env.EMAIL_USER;
   const reply_to = process.env.EMAIL_USER;
-  const template = "verifyEmail";
   const name = user.name;
   const link = verificationUrl;
 
   try {
     // Construct the path to the template file
-    const templatePath = path.join(__dirname, "..", "views", `${template}.html`);
+    const templatePath = path.join(
+      __dirname, 
+      "..", // Go up from controllers directory
+      "views", 
+      "verifyEmail.html" // Specific template file
+    );
 
     // Read the template file
     let html = await fs.readFile(templatePath, "utf-8");
@@ -172,13 +176,17 @@ const sendLoginCode = asyncHandler(async(req, res) => {
   const send_to = email;
   const sent_from = process.env.EMAIL_USER;
   const reply_to = process.env.EMAIL_USER;
-  const template = "loginCode";
   const name = user.name;
   const link = decryptedLoginCode;
 
   try {
     // Construct the path to the template file
-    const templatePath = path.join(__dirname, "..", "views", `${template}.html`);
+    const templatePath = path.join(
+      __dirname, 
+      "..", // Go up from controllers directory
+      "views", 
+      "loginCode.html" // Specific template file
+    );
 
     // Read the template file
     let html = await fs.readFile(templatePath, "utf-8");
@@ -564,7 +572,7 @@ const forgotPassword = asyncHandler(async(req, res) => {
   }).save();
 
   // Contruct RESET URL
-  const resetUrl = `${process.env.FRONTEND_URL}/verify/${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`;
 
   // Send RESET email
   const subject = "Reset Your Password - AuthZ Pro";
@@ -573,26 +581,19 @@ const forgotPassword = asyncHandler(async(req, res) => {
   const sent_from = process.env.EMAIL_USER;
   const name = user.name;
   const link = resetUrl;
+  const templateId = "d-33cdce477c4a4e9b9c45ce36a4a806cf";
 
   try {
-    // Construct the path to the template file
-    const templatePath = path.join(__dirname, "..", "views", `${template}.html`);
-
-    // Read the template file
-    let html = await fs.readFile(templatePath, "utf-8");
-
-    // Replace placeholders with dynamic data
-    html = html.replace("{{name}}", name);
-    html = html.replace("{{link}}", link);
-
     await sendEmail(
-      subject,
       send_to,
       sent_from,
       reply_to,
-      html, // Pass the rendered HTML
-      name,
-      link
+      templateId, // Pass the template ID
+      { // Pass dynamic data
+        name: name,
+        link: link,
+        subject: subject
+      }
     );
       res.status(200).json({ message: "Password Reset Email Sent" });
     } catch (error) {
