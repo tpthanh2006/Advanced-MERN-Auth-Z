@@ -17,6 +17,7 @@ const initialState = {
 const Reset = () => {
     const [formData, setFormData] = useState(initialState);
     const {password, password2} = formData;
+    const { resetToken } = useParams();
     const { isLoading, isLoggedIn, isSuccess, message } = useSelector(
       (state) => state.auth
     );
@@ -40,10 +41,16 @@ const Reset = () => {
         password2
       }
 
-      await dispatch(resetPassword(userData));
-      await dispatch(RESET(userData));
-      navigate("/login");
+      await dispatch(resetPassword(userData, resetToken));
     }
+
+    useEffect(() => {
+      if (isSuccess && message.includes("Reset Successful")) {
+        navigate("/login");
+      }
+  
+    dispatch(RESET());
+    }, [dispatch, navigate, message, isSuccess]);
 
   return (
     <div className={`container ${styles.auth}`}>
