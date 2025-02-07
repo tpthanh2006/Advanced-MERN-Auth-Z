@@ -125,12 +125,26 @@ export const verifyUser = createAsyncThunk(
   }
 )
 
-// Change PasswordchangePassword
+// Change Password
 export const changePassword = createAsyncThunk(
   "auth/changePassword",
   async (userData, thunkAPI) => {
     try {
       return await authService.changePassword(userData);
+    } catch (error) {
+      const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
+
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
+// Forgot Password
+export const forgotPassword = createAsyncThunk(
+  "auth/forgotPassword",
+  async (userData, thunkAPI) => {
+    try {
+      return await authService.forgotPassword(userData);
     } catch (error) {
       const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
 
@@ -310,6 +324,22 @@ const authSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
         toast.error(action.payload);
+      })
+
+      // Forgotforgot Password
+      .addCase(forgotPassword.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(forgotPassword.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.message = action.payload;
+        toast.success(action.payload);
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
       })
   }
 });

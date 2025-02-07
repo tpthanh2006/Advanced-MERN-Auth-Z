@@ -68,6 +68,13 @@ const changePassword = async (userData) => {
   return response.data.message;
 };
 
+// Forgot Password
+const forgotPassword = async (userData) => {
+  const response = await axios.post(API_URL + "forgotPassword", userData);
+
+  return response.data.message;
+};
+
 const authService = {
   register,
   login,
@@ -77,7 +84,8 @@ const authService = {
   updateUser,
   sendVerificationEmail,
   verifyUser,
-  changePassword
+  changePassword,
+  forgotPassword
 }
 
 export default authService

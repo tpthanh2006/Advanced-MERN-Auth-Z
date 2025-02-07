@@ -12,10 +12,8 @@ import {
   logout,
   RESET,
 } from "../../redux/features/auth/authSlice";
-import {
-  sendAutomatedEmail,
-} from "../../redux/features/email/emailSlice";
 import { Spinner } from "../../components/loader/Loader";
+import { sendAutomatedEmail } from "../../redux/features/email/emailSlice";
 
 const initialState = {
   oldPasssword: "",
