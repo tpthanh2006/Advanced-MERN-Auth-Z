@@ -575,7 +575,7 @@ const forgotPassword = asyncHandler(async(req, res) => {
   const resetUrl = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`;
 
   // Send RESET email
-  const subject = "Reset Your Password - AuthZ Pro";
+  const subject = "Reset Your Password - AuthZ Pro"; // Put this in the settings of SendGrid
   const send_to = user.email;
   const reply_to = process.env.EMAIL_USER;
   const sent_from = process.env.EMAIL_USER;
