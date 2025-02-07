@@ -39,7 +39,7 @@ const Header = () => {
               <li className='--flex-center'>
                 <FaUserCircle size={20} />
                 <p className="--color-white">
-                Hi, William!
+                &nbsp; Hi, William!
                 </p>
               </li>
             </ShowOnLogin>

@@ -18,17 +18,24 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getLoginStatus,
-  RESET,
+  getUser,
+  selectIsLoggedIn,
+  selectUser 
 } from "./redux/features/auth/authSlice";
 
 axios.defaults.withCredentials = true;
 
 function App() {
   const dispatch = useDispatch();
+  const isLoggedIn = useSelector(selectIsLoggedIn);
+  const user = useSelector(selectUser);
 
   useEffect(() => {
-    dispatch(getLoginStatus())
-  }, [dispatch]);
+    dispatch(getLoginStatus());
+    if (isLoggedIn && user === null) {
+      dispatch(getUser());
+    }
+  }, [dispatch, isLoggedIn, user]);
 
   return (
     <>
