@@ -8,6 +8,8 @@ const sendEmail = require("../utils/sendEmail");
 const Token = require("../models/tokenModel");
 const crypto = require("crypto");
 const Cryptr = require("cryptr");
+const path = require("path"); // Import the 'path' module
+const fs = require("fs").promises; // Import the 'fs' promises API
 
 const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 
@@ -484,12 +486,24 @@ const sendAutomatedEmail = asyncHandler(async (req, res) => {
   const link = `${process.env.FRONTEND_URL}${url}`;
 
   try {
+    // Construct the path to the template file
+    const templatePath = path.join(__dirname, "..", "views", `${template}.handlebars`);
+
+    // Read the template file
+    const templateContent = await fs.readFile(templatePath, "utf-8");
+
+    // Compile the template using Handlebars
+    const handlebars = require("handlebars");
+    const compiledTemplate = handlebars.compile(templateContent);
+
+    // Render the template with the data
+    const html = compiledTemplate({ name, link });
+
     await sendEmail(
       subject,
       send_to,
-      sent_from,
       reply_to,
-      template,
+      html, // Pass the rendered HTML
       name,
       link
     );

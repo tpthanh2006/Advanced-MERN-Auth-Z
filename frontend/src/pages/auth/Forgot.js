@@ -16,7 +16,7 @@ const Forgot = () => {
   const dispatch = useDispatch();
 
   const { isLoading } = useSelector((state) => state.auth);
-  
+
     const forgot = async (e) => {
       e.preventDefault();
 
@@ -38,6 +38,7 @@ const Forgot = () => {
 
   return (
     <div className={`container ${styles.auth}`}>
+      {isLoading && <Loader />}
       <Card>
           <div className={styles.form}>
           <div className="--flex-center">
@@ -56,7 +57,7 @@ const Forgot = () => {
             />
 
             <button type="submit" className="--btn --btn-primary --btn-block">
-              Forgot
+              Get Reset Email
             </button>
 
             <div className={styles.links}>
