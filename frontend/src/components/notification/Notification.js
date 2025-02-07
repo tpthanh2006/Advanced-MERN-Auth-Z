@@ -22,8 +22,9 @@ const Notification = () => {
         </p>
         <p>
           To verify your account, check your email for a verification link.
+          &nbsp;
         </p>
-        <p classname="v-link" onClick={sendVerEmail}>
+        <p className="v-link" onClick={sendVerEmail}>
           <b>Resend Link</b>
         </p>
       </div>
