@@ -60,7 +60,7 @@ export const getLoginStatus = createAsyncThunk(
   "auth/getLoginStatus",
   async (_, thunkAPI) => {
     try {
-      return await authService.loginStatus();
+      return await authService.getLoginStatus();
     } catch (error) {
       const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
 

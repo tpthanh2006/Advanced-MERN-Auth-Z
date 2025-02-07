@@ -46,13 +46,20 @@ const updateUser = async (userData) => {
   return response.data;
 };
 
+// Update Profile
+const sendVerificationEmail = async () => {
+  const response = await axios.patch(API_URL + "sendVerificationEmail");
+  return response.data.message;
+};
+
 const authService = {
   register,
   login,
   logout,
   getLoginStatus,
   getUser,
-  updateUser
+  updateUser,
+  sendVerificationEmail
 }
 
 export default authService
