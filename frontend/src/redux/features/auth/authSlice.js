@@ -326,7 +326,7 @@ const authSlice = createSlice({
         toast.error(action.payload);
       })
 
-      // Forgotforgot Password
+      // Forgot Password
       .addCase(forgotPassword.pending, (state, action) => {
         state.isLoading = true;
       })
