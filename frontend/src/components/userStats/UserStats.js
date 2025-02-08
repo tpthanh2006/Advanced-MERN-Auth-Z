@@ -20,6 +20,7 @@ const UserStats = () => {
   const { users, verifiedUsers, suspendedUsers } = useSelector(
     (state) => state.auth
   );
+  const unverifiedUsers = users.length - verifiedUsers;
 
   useEffect(() => {
     dispatch(CALC_VERIFIED_USER());
@@ -30,9 +31,9 @@ const UserStats = () => {
     <h3 className="--mt">User Stats</h3>
     <div className="info-summary">
       <InfoBox icon={icon1} title={"Total Users"} count={users.length} bgColor="card1" />
-      <InfoBox icon={icon2} title={"Verified Users"} count={"2"} bgColor="card2" />
-      <InfoBox icon={icon3} title={"Unverified Users"} count={"1"} bgColor="card3" />
-      <InfoBox icon={icon4} title={"Suspended Users"} count={"0"} bgColor="card4" />
+      <InfoBox icon={icon2} title={"Verified Users"} count={verifiedUsers} bgColor="card2" />
+      <InfoBox icon={icon3} title={"Unverified Users"} count={unverifiedUsers} bgColor="card3" />
+      <InfoBox icon={icon4} title={"Suspended Users"} count={suspendedUsers} bgColor="card4" />
     </div>
   </div>
 }
