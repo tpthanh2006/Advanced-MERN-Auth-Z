@@ -486,9 +486,9 @@ const upgradeUser = asyncHandler(async(req, res) => {
 
 // Send Automated emails
 const sendAutomatedEmail = asyncHandler(async (req, res) => {
-  const { subject, send_to, reply_to, template, url } = req.body;
+  const { subject, send_to, reply_to, templateId, url } = req.body;
 
-  if (!subject || !send_to || !reply_to || !template) {
+  if (!subject || !send_to || !reply_to || !templateId) {
     return res.status(400).json({ message: "Missing email parameter" });
   }
 
@@ -504,25 +504,18 @@ const sendAutomatedEmail = asyncHandler(async (req, res) => {
   const link = `${process.env.FRONTEND_URL}${url}`;
 
   try {
-    // Construct the path to the template file
-    const templatePath = path.join(__dirname, "..", "views", `${template}.html`);
-
-    // Read the template file
-    let html = await fs.readFile(templatePath, "utf-8");
-
-    // Replace placeholders with dynamic data
-    html = html.replace("{{name}}", name);
-    html = html.replace("{{link}}", link);
-
     await sendEmail(
-      subject,
       send_to,
       sent_from,
       reply_to,
-      html, // Pass the rendered HTML
-      name,
-      link
+      templateId,
+      {
+        name: name,
+        link: link,
+        subject: subject
+      }
     );
+    
     res.status(200).json({ message: "Email Sent" });
   } catch (error) {
     console.error("Email Error:", error);

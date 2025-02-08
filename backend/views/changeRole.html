@@ -1,9 +1,10 @@
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>{{subject}}</title>  <!-- Display subject here -->
     <style>
       body { background-color: #0a1930; padding: 30px; font-family: Arial,
       Helvetica, sans-serif; } .container { background-color: #eee; padding:
@@ -24,17 +25,17 @@
   <body>
     <div class="container">
       <div class="logo flex-center">
-        <h2 class="color-white">AUTH:Z</h2>
+        <h2 class="color-white">AuthZ Pro</h2>
       </div>
       <h2>Hello <span class="color-danger">{{name}},</span></h2>
-      <p>This is to notify you that your account password was changed.</p>
-      <p>If you did not initiate this, please reset your password immediately.</p>
+      <p>This is to notify you that your account role was changed.</p>
+      <p>Please log in for confirmation.</p>
 
-      <a href={{link}} class="btn btn-success">Change Password</a>
+      <a href={{link}} class="btn btn-success">Login</a>
 
       <div class="my">
         <p>Best Regards,</p>
-        <p><b class="color-danger">AUTH:Z</b> Team</p>
+        <p><b class="color-danger">AuthZ Pro</b> Team</p>
       </div>
     </div>
   </body>

@@ -96,6 +96,13 @@ const deleteUser = async (id) => {
   return response.data.message;
 };
 
+// Delete User
+const upgradeUser = async (userData) => {
+  const response = await axios.post(API_URL + "upgradeUser", userData);
+
+  return response.data.message;
+};  
+
 const authService = {
   register,
   login,
@@ -109,7 +116,8 @@ const authService = {
   forgotPassword,
   resetPassword,
   getUsers,
-  deleteUser
+  deleteUser,
+  upgradeUser
 }
 
 export default authService

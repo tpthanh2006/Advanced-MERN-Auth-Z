@@ -93,7 +93,7 @@ const UserList = () => {
                       <td>{email}</td>
                       <td>{role}</td>
                       <td>
-                        <ChangeRole />
+                        <ChangeRole _id={_id} email={email}/>
                       </td>
                       <td>
                         <span>
