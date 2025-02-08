@@ -72,7 +72,7 @@ const UserList = () => {
   return <section>
     <div className="container">
       <PageMenu />
-      {/*<UserStats />*/}
+      <UserStats />
 
       <div className="user-list">
       {isLoading && <Spinner />}
