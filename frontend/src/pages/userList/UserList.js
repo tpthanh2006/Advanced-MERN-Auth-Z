@@ -20,6 +20,7 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 const UserList = () => {
   useRedirectLoggedOutUser("/login");
   const dispatch = useDispatch();
+  const [search, setSearch] = useState("");
 
   const { users, isLoading, isLoggedIn, isSuccess, message} = useSelector((state) => state.auth);
 
@@ -64,7 +65,7 @@ const UserList = () => {
             </span>
 
             <span>
-              <Search />
+              <Search value={search} onChange={(e) => setSearch(e.target.value)} />
             </span>
           </div>
 
