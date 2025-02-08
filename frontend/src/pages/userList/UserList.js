@@ -11,10 +11,10 @@ import { deleteUser, getUsers } from "../../redux/features/auth/authSlice";
 import "./UserList.scss";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-/*import {
+import {
   FILTER_USERS,
   selectUsers,
-} from "../../redux/features/auth/filterSlice";*/
+} from "../../redux/features/auth/filterSlice";
 //import ReactPaginate from "react-paginate";
 
 const UserList = () => {
@@ -23,6 +23,7 @@ const UserList = () => {
   const [search, setSearch] = useState("");
 
   const { users, isLoading, isLoggedIn, isSuccess, message} = useSelector((state) => state.auth);
+  const filteredUsers = useSelector(selectUsers);
 
   useEffect(() => {
     dispatch(getUsers());
@@ -48,6 +49,10 @@ const UserList = () => {
       ],
     });
   };
+
+  useEffect(() => {
+    dispatch(FILTER_USERS({ users, search }));
+  }, [dispatch, users, search ])
 
   return <section>
     <div className="container">
@@ -85,7 +90,7 @@ const UserList = () => {
               </thead>
 
               <tbody>
-                {users.map((user, index) => {
+                {filteredUsers.map((user, index) => {
                   const {_id, name, email, role} = user;
                   return (
                     <tr key={_id}>
