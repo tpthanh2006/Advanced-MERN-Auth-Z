@@ -3,7 +3,7 @@
 This project demonstrates advanced user authentication flows, secure authorization mechanisms, and professional-grade user management features.
 
 🛠 Technologies Used
-- React, SCSS, React Router V6, Node.js, Express.js, MongoDB, JWT, Google OAuth, SMTP/Nodemailer, Render (Backend), Vercel (Frontend)
+- React, SCSS, React Router V6, Node.js, Express.js, MongoDB, JWT, Google OAuth, SendGrid, Render (Backend), Vercel (Frontend)
 
 ✨ Key Features
 - User Authentication
