@@ -10,8 +10,10 @@ const crypto = require("crypto");
 const Cryptr = require("cryptr");
 const path = require("path"); // Import the 'path' module
 const fs = require("fs").promises; // Import the 'fs' promises API
+const { OAuth2Client } = require("google-auth-library");
 
 const cryptr = new Cryptr(process.env.CRYPTR_KEY);
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Sign Up
 const registerUser = asyncHandler(async(req, res) => {
@@ -148,7 +150,7 @@ const sendLoginCode = asyncHandler(async(req, res) => {
   // Find Login Code in DB
   let userToken = await Token.findOne({
     userId: user._id,
-    expiresAt: {$gt: Date.now()}
+    expiredAt: {$gt: Date.now()}
   });
 
   if (!userToken) {
@@ -166,31 +168,19 @@ const sendLoginCode = asyncHandler(async(req, res) => {
   const reply_to = process.env.EMAIL_USER;
   const name = user.name;
   const link = decryptedLoginCode;
+  const templateId = "d-626b1aa578cd4bdaa06964df145b8c45";
 
   try {
-    // Construct the path to the template file
-    const templatePath = path.join(
-      __dirname, 
-      "..", // Go up from controllers directory
-      "views", 
-      "loginCode.html" // Specific template file
-    );
-
-    // Read the template file
-    let html = await fs.readFile(templatePath, "utf-8");
-
-    // Replace placeholders with dynamic data
-    html = html.replace("{{name}}", name);
-    html = html.replace("{{link}}", link);
-
     await sendEmail(
-      subject,
       send_to,
       sent_from,
       reply_to,
-      html, // Pass the rendered HTML
-      name,
-      link
+      templateId,
+      {
+        name: name,
+        link: link,
+        subject: subject
+      }
     );
     
     res.status(200).json({ message: `Access code sent to ${email}` });
@@ -207,7 +197,7 @@ const verifyUser = asyncHandler(async(req, res) => {
   const hashedToken = hashToken(verificationToken);
   const userToken = await Token.findOne({
     vToken: hashedToken,
-    expiresAt: {$gt: Date.now()}
+    expiredAt: {$gt: Date.now()}
   });
 
   if (!userToken) {
@@ -265,20 +255,14 @@ const loginUser = asyncHandler(async(req, res) => {
     const encryptedLoginCode = cryptr.encrypt(loginCode.toString());
 
     // Save login code
-    let userToken = await Token.findOne({ userId: user._id });
-    if (userToken) {
-      await userToken.deleteOne();
-    }
+    await Token.findOneAndDelete({ userId: user._id });
 
     await new Token({
       userId: user._id,
       lToken: encryptedLoginCode,
       createdAt: Date.now(),
-      expiresAt: Date.now() + 60 * (60 * 1000)
+      expiredAt: Date.now() + 60 * (60 * 1000)
     }).save();
-
-    // Send login code email
-    // ... email sending code ...
 
     res.status(400);
     throw new Error("New browser or device detected.");
@@ -287,25 +271,27 @@ const loginUser = asyncHandler(async(req, res) => {
   // Known device - proceed with login
   const token = generateToken(user._id);
   
-  res.cookie("token", token, {
-    path: "/",
-    httpOnly: true,
-    expires: new Date(Date.now() + 1000 * 86400),
-    sameSite: "none", 
-    secure: true,
-  });
-
-  res.status(200).json({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    bio: user.bio,
-    photo: user.photo,
-    role: user.role,
-    isVerified: user.isVerified,
-    token
-  });
+  if (user && passwordIsCorrect) {
+    res.cookie("token", token, {
+      path: "/",
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400),
+      sameSite: "none", 
+      secure: true,
+    });
+  
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      bio: user.bio,
+      photo: user.photo,
+      role: user.role,
+      isVerified: user.isVerified,
+      token
+    });
+  }
 });
 
 const loginWithCode = asyncHandler(async(req, res) => {
@@ -322,7 +308,7 @@ const loginWithCode = asyncHandler(async(req, res) => {
   // Find user login token
   const userToken = await Token.findOne({
     userId: user._id,
-    expiresAt: {gt: Date.now()}
+    expiredAt: { $gt: Date.now() }
   })
 
   if (!userToken) {
@@ -342,6 +328,9 @@ const loginWithCode = asyncHandler(async(req, res) => {
 
     user.userAgent.push(thisUserAgent);
     await user.save();
+
+    // Delete used token
+    await userToken.deleteOne();
 
     // Generate Token
     const token = generateToken(user._id)
@@ -376,7 +365,7 @@ const logoutUser = asyncHandler(async(req, res) => {
   return res.status(200).json({message: "Logout successful"});
 })
 
-//dGet User
+// Get User
 const getUser = asyncHandler(async(req, res) => {
   const user = await User.findById(req.user._id);
 
@@ -552,7 +541,7 @@ const forgotPassword = asyncHandler(async(req, res) => {
       userId: user._id,
       rToken: hashedToken,
       createdAt: Date.now(),
-      expiredAt: Date.now() + (60 * 60 * 1000) // 1 hour in milliseconds
+      expiredAt: Date.now() + 60 * (60 * 1000) // 1 hour in milliseconds
     }).save();
 
     // Construct Reset URL
@@ -597,7 +586,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
   const userToken = await Token.findOne({
     rToken: hashedToken,
-    expiresAt: { $gt: Date.now() },
+    expiredAt: { $gt: Date.now() },
   });
 
   if (!userToken) {
@@ -650,6 +639,97 @@ const changePassword = asyncHandler(async(req, res) => {
   }
 });
 
+const loginWithGoogle = asyncHandler(async(req, res) => {
+  const { userToken } = req.body;
+  //console.log(userToken);
+
+  const ticket = await client.verifyIdToken({
+    idToken: userToken,
+    audience: process.env.GOOGLE_CLIENT_ID
+  });
+
+  const payload = ticket.getPayload();
+  const { name, email, picture, sub } = payload;
+  const password = Date.now() + sub;
+  //console.log(payload);
+
+  // Get UserAgent
+  const ua = parser(req.headers["user-agent"]);
+  const userAgent = [ua.ua];
+
+  // Check if user exists
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    //   Create new user
+    const newUser = await User.create({
+      name,
+      email,
+      password,
+      photo: picture,
+      isVerified: true,
+      userAgent,
+    });
+
+    if (newUser) {
+      // Generate Token
+      const token = generateToken(newUser._id);
+
+      // Send HTTP-only cookie
+      res.cookie("token", token, {
+        path: "/",
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000 * 86400), // 1 day
+        sameSite: "none",
+        secure: true,
+      });
+
+      const { _id, name, email, phone, bio, photo, role, isVerified } = newUser;
+
+      res.status(201).json({
+        _id,
+        name,
+        email,
+        phone,
+        bio,
+        photo,
+        role,
+        isVerified,
+        token,
+      });
+    }
+  }
+
+  // User already existed -> Login
+  if (user) {
+    // Generate Token
+    const token = generateToken(user._id);
+
+    // Send HTTP-only cookie
+    res.cookie("token", token, {
+      path: "/",
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400), // 1 day
+      sameSite: "none",
+      secure: true,
+    });
+
+    const { _id, name, email, phone, bio, photo, role, isVerified } = user;
+
+    res.status(201).json({
+      _id,
+      name,
+      email,
+      phone,
+      bio,
+      photo,
+      role,
+      isVerified,
+      token,
+    });
+  }
+})
+
 module.exports = {
   registerUser,
   loginUser,
@@ -667,5 +747,6 @@ module.exports = {
   resetPassword,
   changePassword,
   sendLoginCode,
-  loginWithCode
+  loginWithCode,
+  loginWithGoogle
 }

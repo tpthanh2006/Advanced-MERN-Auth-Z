@@ -211,6 +211,48 @@ export const upgradeUser = createAsyncThunk(
   }
 )
 
+// Send Login Code
+export const sendLoginCode = createAsyncThunk(
+  "auth/sendLoginCode",
+  async (email, thunkAPI) => {
+    try {
+      return await authService.sendLoginCode(email);
+    } catch (error) {
+      const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
+
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
+// Login With Code
+export const loginWithCode = createAsyncThunk(
+  "auth/loginWithCode",
+  async ({code, email}, thunkAPI) => {
+    try {
+      return await authService.loginWithCode(code, email);
+    } catch (error) {
+      const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
+
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
+// Login With Google
+export const loginWithGoogle = createAsyncThunk(
+  "auth/loginWithGoogle",
+  async (userToken, thunkAPI) => {
+    try {
+      return await authService.loginWithGoogle(userToken);
+    } catch (error) {
+      const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
+
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -296,7 +338,10 @@ const authSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
         state.user = null;
-        toast.error("Login unsuccessful");
+        toast.error(action.payload);
+        if (action.payload.includes("New browser")) {
+          state.twoFactor = true;
+        }
       })
 
       // Logout User
@@ -497,6 +542,62 @@ const authSlice = createSlice({
       .addCase(upgradeUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
+        state.message = action.payload;
+        toast.error(action.payload);
+      })
+
+      // Send Login Code
+      .addCase(sendLoginCode.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(sendLoginCode.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.message = action.payload;
+        toast.success(action.payload);
+      })
+      .addCase(sendLoginCode.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(action.payload);
+      })
+
+      // Login With Code
+      .addCase(loginWithCode.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(loginWithCode.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.isLoggedIn = true;
+        state.twoFactor = false;
+        state.user = action.payload;
+        toast.success(action.payload);
+      })
+      .addCase(loginWithCode.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.user = null;
+        state.message = action.payload;
+        toast.error(action.payload);
+      })
+
+      // Login With Google
+      .addCase(loginWithGoogle.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(loginWithGoogle.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.isLoggedIn = true;
+        state.user = action.payload;
+        toast.success("Login Successful");
+      })
+      .addCase(loginWithGoogle.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.user = null;
         state.message = action.payload;
         toast.error(action.payload);
       })
