@@ -89,7 +89,7 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
   // Delete token if already existed in db
   let token = await Token.findOne({ userId: user._id});
   if (token) {
-    await token.deleteOne()
+    await token.deleteOne();
   }
 
   // Create Verification Token and Save
@@ -127,7 +127,7 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
         name: name,
         link: link,
         subject: subject
-      }
+      } 
     );
       
     res.status(200).json({ message: "Verification Email Sent" });

@@ -113,7 +113,7 @@ export const sendVerificationEmail = createAsyncThunk(
   }
 )
 
-// Send Verification Email
+// Verify User
 export const verifyUser = createAsyncThunk(
   "auth/verifyUser",
   async (verificationToken, thunkAPI) => {
